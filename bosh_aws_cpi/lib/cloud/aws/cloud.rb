@@ -30,8 +30,6 @@ module Bosh::AwsCloud
       aws_logger = @logger
 
       @aws_params = {
-        access_key_id:     aws_properties['access_key_id'],
-        secret_access_key: aws_properties['secret_access_key'],
         region:            aws_properties['region'],
         ec2_endpoint:      aws_properties['ec2_endpoint'] || default_ec2_endpoint,
         elb_endpoint:      aws_properties['elb_endpoint'] || default_elb_endpoint,
@@ -40,6 +38,8 @@ module Bosh::AwsCloud
       }
 
       %w(
+        access_key_id
+        secret_access_key
         http_read_timeout
         http_wire_trace
         proxy_uri
@@ -668,9 +668,10 @@ module Bosh::AwsCloud
     # Checks if options passed to CPI are valid and can actually
     # be used to create all required data structures etc.
     #
+    # DRR TODO - should check for what is required to auth to AWS
     def validate_options
       required_keys = {
-          "aws" => ["access_key_id", "secret_access_key", "region", "default_key_name"],
+          "aws" => ["region", "default_key_name"],
           "registry" => ["endpoint", "user", "password"],
       }
 

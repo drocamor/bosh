@@ -15,14 +15,14 @@ module Bosh::Registry
 
         @aws_properties = cloud_config["aws"]
         @aws_options = {
-          :access_key_id => @aws_properties["access_key_id"],
-          :secret_access_key => @aws_properties["secret_access_key"],
           :max_retries => @aws_properties["max_retries"] || AWS_MAX_RETRIES,
           :ec2_endpoint => @aws_properties['ec2_endpoint'] || "ec2.#{@aws_properties['region']}.amazonaws.com",
           :logger => @logger
         }
         # configure optional parameters
         %w(
+          access_key_id
+          secret_access_key
           ssl_verify_peer
           ssl_ca_file
           ssl_ca_path
@@ -36,8 +36,6 @@ module Bosh::Registry
       def validate_options(cloud_config)
         unless cloud_config.has_key?("aws") &&
             cloud_config["aws"].is_a?(Hash) &&
-            cloud_config["aws"]["access_key_id"] &&
-            cloud_config["aws"]["secret_access_key"] &&
             cloud_config["aws"]["region"]
           raise ConfigError, "Invalid AWS configuration parameters"
         end
