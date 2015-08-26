@@ -716,6 +716,12 @@ module Bosh::AwsCloud
         end
       end
 
+      if credentials_source == 'env_or_profile'
+        if options["aws"].has_key?("access_key_id") || options["aws"].has_key?("secret_access_key")
+            validation_errors << "Can't use access_key_id and secret_access_key with env_or_profile credentials_source"
+        end
+      end
+
       raise ArgumentError, "Invalid credentials_source: #{validation_errors.join(', ')}" unless validation_errors.empty?
     end
 
