@@ -264,6 +264,8 @@ describe Bosh::AwsCloud::Cloud do
           {
             'aws' => {
               'credentials_source' => 'static'
+              'region' => 'fake-region',
+              'default_key_name' => 'sesame'
             }
           }
         end
@@ -280,7 +282,13 @@ describe Bosh::AwsCloud::Cloud do
       let(:options) do
         {
           'aws' => {
-            'credentials_source' => 'env_or_profile'
+            'credentials_source' => 'env_or_profile',
+            'region' => 'fake-region',
+            'default_key_name' => 'sesame'
+          },
+          'registry' => {
+            'user' => 'abuser',
+            'password' => 'hard2gess'
           }
         }
       end
@@ -294,7 +302,13 @@ describe Bosh::AwsCloud::Cloud do
         {
           'aws' => {
             'credentials_source' => 'env_or_profile',
-            'access_key_id' => 'some access key'
+            'access_key_id' => 'some access key',
+            'region' => 'fake-region',
+            'default_key_name' => 'sesame'
+          },
+          'registry' => {
+            'user' => 'abuser',
+            'password' => 'hard2gess'
           }
         }
       end
@@ -308,7 +322,17 @@ describe Bosh::AwsCloud::Cloud do
 
     context 'when an unknown credentails_source is set' do
       let(:options) do
-        {'aws' => {'credentials_source' => 'NotACredentialsSource'}}
+        {
+          'aws' => {
+            'credentials_source' => 'NotACredentialsSource',
+            'region' => 'fake-region',
+            'default_key_name' => 'sesame'
+          },
+          'registry' => {
+            'user' => 'abuser',
+            'password' => 'hard2gess'
+          }
+        }
       end
 
       it 'raises an error' do
