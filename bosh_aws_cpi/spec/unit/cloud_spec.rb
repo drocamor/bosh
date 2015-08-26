@@ -263,9 +263,14 @@ describe Bosh::AwsCloud::Cloud do
         let(:options) do
           {
             'aws' => {
-              'credentials_source' => 'static'
+              'credentials_source' => 'static',
               'region' => 'fake-region',
               'default_key_name' => 'sesame'
+            },
+            'registry' => {
+              'user' => 'abuser',
+              'password' => 'hard2gess',
+              'endpoint' => 'http://websites.com'
             }
           }
         end
@@ -288,7 +293,8 @@ describe Bosh::AwsCloud::Cloud do
           },
           'registry' => {
             'user' => 'abuser',
-            'password' => 'hard2gess'
+            'password' => 'hard2gess',
+            'endpoint' => 'http://websites.com'
           }
         }
       end
@@ -308,7 +314,8 @@ describe Bosh::AwsCloud::Cloud do
           },
           'registry' => {
             'user' => 'abuser',
-            'password' => 'hard2gess'
+            'password' => 'hard2gess',
+            'endpoint' => 'http://websites.com'
           }
         }
       end
@@ -330,7 +337,8 @@ describe Bosh::AwsCloud::Cloud do
           },
           'registry' => {
             'user' => 'abuser',
-            'password' => 'hard2gess'
+            'password' => 'hard2gess',
+            'endpoint' => 'http://websites.com'
           }
         }
       end
