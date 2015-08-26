@@ -30,6 +30,16 @@ module Bosh::Registry
           @aws_options[k.to_sym] = @aws_properties[k] unless @aws_properties[k].nil?
         end
 
+        # credentials_source could be static (default) or env_or_profile
+        # static credentials must be included in aws_properties
+        # env_or_profile credentials will use the AWS DefaultCredentialsProvider
+        # to find AWS credentials in environment variables or EC2 instance profiles
+
+        if cloud_config['aws']['credentials_source'] == 'static' || cloud_config['aws']['credentials_source'].nil?
+          @aws_options[:access_key_id] = cloud_config['aws']['access_key_id']
+          @aws_options[:secret_access_key] = cloud_config['aws']['secret_access_key']
+        end
+
         @ec2 = AWS::EC2.new(@aws_options)
       end
 
@@ -38,6 +48,15 @@ module Bosh::Registry
             cloud_config["aws"].is_a?(Hash) &&
             cloud_config["aws"]["region"]
           raise ConfigError, "Invalid AWS configuration parameters"
+        end
+
+        if cloud_config['aws']['credentials_source'] == 'static' || cloud_config['aws']['credentials_source'].nil?
+          unless cloud_config['aws']['access_key_id'] &&
+            cloud_config['aws']['secret_access_key']
+            raise ConfigError, 'Must use access_key_id and secret_access_key with static credentials_source'
+          end
+        elsif cloud_config['aws']['credentials_source'] != 'env_or_profile'
+          raise ConfigError, "Invalid credentials_source: #{cloud_config['aws']['credentials_source']}"
         end
       end
 
