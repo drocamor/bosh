@@ -706,7 +706,7 @@ module Bosh::AwsCloud
 
       credentials_source = options['aws']['credentials_source'] || 'static'
 
-      if credentials_source != 'env_or_profile' || credentials_source != 'static'
+      if credentials_source != 'env_or_profile' && credentials_source != 'static'
         validation_errors << "Unknown credentials_source #{credentials_source}"
       end
 
