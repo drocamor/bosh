@@ -29,7 +29,6 @@ module Bosh
         @encryption_key = @options[:encryption_key]
 
         aws_options = {
-          credentials_source: @options.fetch(:credentials_source, 'static'),
           use_ssl: @options.fetch(:use_ssl, true),
           s3_port: @options.fetch(:port, 443),
           s3_endpoint: @options.fetch(:host, URI.parse(S3BlobstoreClient::ENDPOINT).host),
@@ -42,15 +41,21 @@ module Bosh
         # static credentials must be included in aws_properties
         # env_or_profile credentials will use the AWS DefaultCredentialsProvider
         # to find AWS credentials in environment variables or EC2 instance profiles
+        credentials_source = @options.fetch(:credentials_source, 'static')
 
-        if aws_options[:credentials_source] == 'static'
+        if credentials_source != 'static' && credentials_source != 'env_or_profile'
+          raise BlobstoreError, "invalid credentials_source"
+        end
+
+        if credentials_source == 'static'
           aws_options[:access_key_id] = @options[:access_key_id]
           aws_options[:secret_access_key] = @options[:secret_access_key]
         end
 
-        if aws_options[:credentials_source] != 'static' && aws_options[:credentials_source] != 'env_or_profile'
-          puts aws_options[:credentials_source]
-          raise BlobstoreError, "invalid credentials_source"
+        if credentials_source == 'env_or_profile'
+          if !@options[:access_key_id].nil? || !@options[:secret_access_key].nil?
+            raise BlobstoreError, "can't use access_key_id or secret_access_key with env_or_profile credentials_source"
+          end
         end
 
         # using S3 without credentials is a special case:
@@ -179,7 +184,8 @@ module Bosh
       end
 
       def read_only?
-        @options[:credentials_source] == 'static' &&
+        (@options[:credentials_source] == 'static' ||
+        @options[:credentials_source].nil?) &&
         @options[:access_key_id].nil? &&
         @options[:secret_access_key].nil?
       end
