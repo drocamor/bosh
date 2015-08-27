@@ -50,14 +50,25 @@ module Bosh::Registry
           raise ConfigError, "Invalid AWS configuration parameters"
         end
 
-        if cloud_config['aws']['credentials_source'] == 'static' || cloud_config['aws']['credentials_source'].nil?
-          unless cloud_config['aws']['access_key_id'] &&
-            cloud_config['aws']['secret_access_key']
-            raise ConfigError, 'Must use access_key_id and secret_access_key with static credentials_source'
-          end
-        elsif cloud_config['aws']['credentials_source'] != 'env_or_profile'
-          raise ConfigError, "Invalid credentials_source: #{cloud_config['aws']['credentials_source']}"
+        credentials_source = cloud_config['aws']['credentials_source'] || 'static'
+
+        if credentials_source != 'env_or_profile' && credentials_source != 'static'
+          raise ConfigError, "Unknown credentials_source #{credentials_source}"
         end
+
+        if credentials_source == 'static'
+          if !cloud_config["aws"].has_key?("access_key_id") || !cloud_config["aws"].has_key?("secret_access_key")
+              raise ConfigError, "Must use access_key_id and secret_access_key with static credentials_source"
+          end
+        end
+
+        if credentials_source == 'env_or_profile'
+          if cloud_config["aws"].has_key?("access_key_id") || cloud_config["aws"].has_key?("secret_access_key")
+              raise ConfigError, "Can't use access_key_id and secret_access_key with env_or_profile credentials_source"
+          end
+        end
+
+
       end
 
       # Get the list of IPs belonging to this instance
