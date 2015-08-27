@@ -29,7 +29,7 @@ module Bosh
         @encryption_key = @options[:encryption_key]
 
         aws_options = {
-          credentials_source: @options.fetch(:credentials_source, 'static')
+          credentials_source: @options.fetch(:credentials_source, 'static'),
           use_ssl: @options.fetch(:use_ssl, true),
           s3_port: @options.fetch(:port, 443),
           s3_endpoint: @options.fetch(:host, URI.parse(S3BlobstoreClient::ENDPOINT).host),
@@ -43,12 +43,13 @@ module Bosh
         # env_or_profile credentials will use the AWS DefaultCredentialsProvider
         # to find AWS credentials in environment variables or EC2 instance profiles
 
-        if @options[:credentials_source] == 'static'
+        if aws_options[:credentials_source] == 'static'
           aws_options[:access_key_id] = @options[:access_key_id]
           aws_options[:secret_access_key] = @options[:secret_access_key]
         end
 
-        if @options[:credentials_source] != 'static' || @options[:credentials_source] != 'env_or_profile'
+        if aws_options[:credentials_source] != 'static' && aws_options[:credentials_source] != 'env_or_profile'
+          puts aws_options[:credentials_source]
           raise BlobstoreError, "invalid credentials_source"
         end
 
